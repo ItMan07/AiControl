@@ -11,11 +11,22 @@ class HandsData:
         self.cords = [x, y]
         self.map_cords = [x, y]
 
+    # def __setattr__(self, key, value):
+    #     self.cords = value
+    #     self.map_cords = [
+    #         remap(self.cords[0], 0, 1280 + 50, 0, 1920 + 50),
+    #         remap(self.cords[1], 0, 720 + 50, 0, 1080 + 50),
+    #     ]
+
     # def __call__(self):
     #     return self.xy, self.map_xy
 
     def set_data(self, cords):
         self.cords = cords
+        self.map_cords = [
+            remap(self.cords[0], 0, 1280 + 50, 0, 1920 + 50),
+            remap(self.cords[1], 0, 720 + 50, 0, 1080 + 50),
+        ]
 
 
 class AiHands:
@@ -65,26 +76,28 @@ class AiHands:
                 # and (xy[1][0] < 1280 - 50 and xy[1][1] < 720 - 50)
                 1
         ):
-            self.f1.map_cords[0] = remap(self.f1.cords[0], 0, self.cam_width, 0,
-                                         self.screen_width + self.dist_to_click)
-            self.f1.map_cords[1] = remap(self.f1.cords[1], 0, self.cam_height, 0,
-                                         self.screen_height + self.dist_to_click)
+            # self.f1.map_cords[0] = remap(self.f1.cords[0], 0, self.cam_width, 0,
+            #                              self.screen_width + self.dist_to_click)
+            # self.f1.map_cords[1] = remap(self.f1.cords[1], 0, self.cam_height, 0,
+            #                              self.screen_height + self.dist_to_click)
 
             print(self.f1.cords)
-            print(self.f1.map_cords[0], self.f1.map_cords[1])
+            print(self.f1.map_cords)
 
             pyautogui.moveTo(self.f1.map_cords[0], self.f1.map_cords[1], duration=0)
 
-            if e_dist(self.f1.cords[0], self.f1.cords[1],
-                      self.f2.cords[0], self.f2.cords[1]) < self.dist_to_click:
+            if e_dist(
+                    self.f1.cords[0], self.f1.cords[1],
+                    self.f2.cords[0], self.f2.cords[1]
+            ) < self.dist_to_click:
                 pyautogui.leftClick(self.f1.map_cords[0],
                                     self.f1.map_cords[1],
                                     interval=0)
-                print("OK")
+                print("LEFT CLICK")
 
     def processing(self):
         """
-        processing incoming information
+        processing incoming information from camera
         :return: None
         """
         for _ in iter(int, 1):
@@ -111,10 +124,12 @@ class AiHands:
 
                         if id == 8:
                             cv2.circle(img, (width, height), 10, (255, 0, 255), cv2.FILLED)
-                            self.f1.cords = [width, height]
+                            # self.f1.cords = [width, height]
+                            self.f1.set_data([width, height])
                         if id == 4:
                             cv2.circle(img, (width, height), 10, (0, 255, 255), cv2.FILLED)
-                            self.f2.cords = [width, height]
+                            # self.f2.cords = [width, height]
+                            self.f1.set_data([width, height])
 
                     self.control()
 
