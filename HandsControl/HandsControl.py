@@ -11,16 +11,6 @@ class HandsData:
         self.cords = [x, y]
         self.map_cords = [x, y]
 
-    # def __setattr__(self, key, value):
-    #     self.cords = value
-    #     self.map_cords = [
-    #         remap(self.cords[0], 0, 1280 + 50, 0, 1920 + 50),
-    #         remap(self.cords[1], 0, 720 + 50, 0, 1080 + 50),
-    #     ]
-
-    # def __call__(self):
-    #     return self.xy, self.map_xy
-
     def set_data(self, cords):
         self.cords = cords
         self.map_cords = [
@@ -31,11 +21,15 @@ class HandsData:
 
 class AiHands:
     """
-    dist_to_click: px \n
-    flip_code: 1 - horizontal, 0 - vertical \n
-    camera_frame_width: px,\n
-    camera_frame_height: px,\n
+    dist_to_click: px
+    flip_code: 1 - horizontal, 0 - vertical
+    camera_frame_width: px,
+    camera_frame_height: px,
     """
+
+    # pyautogui.MINIMUM_DURATION = 0.1
+    # pyautogui.MINIMUM_SLEEP = 0.1
+    # pyautogui.PAUSE = 0.1
 
     def __init__(
             self,
@@ -71,36 +65,33 @@ class AiHands:
         mouse control
         :return: None
         """
-        if (
-                # (xy[0][0] > 50 and xy[0][1] > 50)
-                # and (xy[1][0] < 1280 - 50 and xy[1][1] < 720 - 50)
-                1
-        ):
-            # self.f1.map_cords[0] = remap(self.f1.cords[0], 0, self.cam_width, 0,
-            #                              self.screen_width + self.dist_to_click)
-            # self.f1.map_cords[1] = remap(self.f1.cords[1], 0, self.cam_height, 0,
-            #                              self.screen_height + self.dist_to_click)
+        # if (
+        #         # (xy[0][0] > 50 and xy[0][1] > 50)
+        #         # and (xy[1][0] < 1280 - 50 and xy[1][1] < 720 - 50)
+        #         1
+        # ):
 
-            print(self.f1.cords)
-            print(self.f1.map_cords)
+        pyautogui.moveTo(self.f1.map_cords[0], self.f1.map_cords[1], duration=0.1)
 
-            pyautogui.moveTo(self.f1.map_cords[0], self.f1.map_cords[1], duration=0)
+        edist = e_dist(
+            self.f1.cords[0], self.f1.cords[1], self.f2.cords[0], self.f2.cords[1]
+        )
+        print(edist)
 
-            if e_dist(
-                    self.f1.cords[0], self.f1.cords[1],
-                    self.f2.cords[0], self.f2.cords[1]
-            ) < self.dist_to_click:
-                pyautogui.leftClick(self.f1.map_cords[0],
-                                    self.f1.map_cords[1],
-                                    interval=0)
-                print("LEFT CLICK")
+        if edist < self.dist_to_click:
+            pyautogui.leftClick(
+                self.f1.map_cords[0],
+                self.f1.map_cords[1],
+                interval=0.1
+            )
+            print("LEFT CLICK")
 
     def processing(self):
         """
         processing incoming information from camera
         :return: None
         """
-        for _ in iter(int, 1):
+        while True:
             good, img = self.camera.read()
             if self.flip_code is not None:
                 img = cv2.flip(img, self.flip_code)
@@ -124,12 +115,10 @@ class AiHands:
 
                         if id == 8:
                             cv2.circle(img, (width, height), 10, (255, 0, 255), cv2.FILLED)
-                            # self.f1.cords = [width, height]
                             self.f1.set_data([width, height])
                         if id == 4:
                             cv2.circle(img, (width, height), 10, (0, 255, 255), cv2.FILLED)
-                            # self.f2.cords = [width, height]
-                            self.f1.set_data([width, height])
+                            self.f2.set_data([width, height])
 
                     self.control()
 
