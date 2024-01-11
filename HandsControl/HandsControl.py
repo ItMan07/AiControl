@@ -1,6 +1,9 @@
+import time
+
 import cv2
 import mediapipe as mp
 import pyautogui
+import mouse
 
 from .utils import *
 
@@ -45,6 +48,8 @@ class AiHands:
         self.f1 = HandsData()
         self.f2 = HandsData()
 
+        # self.timer = 0
+
         self.dist_to_click = dist_to_click
         self.cam_width = camera_frame_width
         self.cam_height = camera_frame_height
@@ -71,20 +76,36 @@ class AiHands:
         #         1
         # ):
 
-        pyautogui.moveTo(self.f1.map_cords[0], self.f1.map_cords[1], duration=0.1)
+        # millis = time.time() * 1000
+
+        # if millis - self.timer >= 100:
+        #     self.timer = millis
+        #     mouse.move(self.f1.map_cords[0], self.f1.map_cords[1], absolute=True, duration=0)
+        #     pyautogui.moveTo(self.f1.map_cords[0], self.f1.map_cords[1], duration=0)
 
         edist = e_dist(
-            self.f1.cords[0], self.f1.cords[1], self.f2.cords[0], self.f2.cords[1]
+            self.f1.cords[0], self.f1.cords[1],
+            self.f2.cords[0], self.f2.cords[1]
         )
-        print(edist)
+        # print('[INFO]', edist)
+        x_start, y_start = mouse.get_position()
 
+        mouse.move(self.f1.map_cords[0], self.f1.map_cords[1], absolute=True, duration=0)
         if edist < self.dist_to_click:
-            pyautogui.leftClick(
-                self.f1.map_cords[0],
-                self.f1.map_cords[1],
-                interval=0.1
-            )
-            print("LEFT CLICK")
+            # pyautogui.leftClick(
+            #     self.f1.map_cords[0],
+            #     self.f1.map_cords[1],
+            #     interval=0.1
+            # )
+            # mouse.click('left')
+
+            # mouse.drag(x_start, y_start, self.f1.map_cords[0], self.f1.map_cords[1], absolute=False, duration=0)
+            # mouse.drag(x_start, y_start, self.f1.map_cords[0], self.f1.map_cords[1], absolute=True, duration=0)
+            mouse.press('left')
+            print("[LOG] LEFT")
+        else:
+            mouse.release('left')
+            # mouse.move(self.f1.map_cords[0], self.f1.map_cords[1], absolute=True, duration=0)
 
     def processing(self):
         """
